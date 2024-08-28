@@ -1,44 +1,52 @@
 #!/usr/bin/python3
-"""
-Define isWineer function, a solution to the Prime Game problem
-"""
+""" prime game interview question """
 
 
-def primes(n):
-    """Return list of prime numbers between 1 and n inclusive
-       Args:
-        n (int): upper boundary of range. lower boundary is always 1
-    """
-    prime = []
-    sieve = [True] * (n + 1)
-    for p in range(2, n + 1):
-        if (sieve[p]):
-            prime.append(p)
-            for i in range(p, n + 1, p):
-                sieve[i] = False
-    return prime
+def get_first_prime(values):
+    for i in values:
+        if isPrime(i):
+            return [v for v in values if v % i != 0]
+    return False
+
+
+def isPrime(x):
+    """ check if number is a prime number """
+    if x < 2 or x == 4:
+        return False
+    for i in range(2, x // 2):
+        if x % i == 0:
+            return False
+    return True
 
 
 def isWinner(x, nums):
-    """
-    Determines winner of Prime Game
-    Args:
-        x (int): no. of rounds of game
-        nums (int): upper limit of range for each round
-    Return:
-        Name of winner (Maria or Ben) or None if winner cannot be found
-    """
-    if x is None or nums is None or x == 0 or nums == []:
+    """ return name of the player that won the most rounds """
+    if x != len(nums):
         return None
-    Maria = Ben = 0
-    for i in range(x):
-        prime = primes(nums[i])
-        if len(prime) % 2 == 0:
-            Ben += 1
+    M = {"Turn": True, "Score": 0}
+    B = {"Turn": False, "Score": 0}
+    round = 0
+    while (x):
+        B["Turn"] = False
+        M["Turn"] = True
+        if round >= len(nums):
+            round = 0
+        current = [x for x in range(1, nums[round] + 1)]
+        while(len(current) > 1):
+            if get_first_prime(current):
+                current = get_first_prime(current)
+                if M["Turn"]:
+                    M["Turn"] = False
+                    B["Turn"] = True
+                else:
+                    B["Turn"] = False
+                    M["Turn"] = True
+        if M["Turn"]:
+            B["Score"] += 1
         else:
-            Maria += 1
-    if Maria > Ben:
+            M["Score"] += 1
+        round += 1
+        x -= 1
+    if B["Score"] < M["Score"]:
         return 'Maria'
-    elif Ben > Maria:
-        return 'Ben'
-    return None
+    return 'Ben'
